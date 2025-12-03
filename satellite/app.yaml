@@ -1,0 +1,37 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: satellite
+  labels:
+    app: satellite
+spec:
+  type: ClusterIP
+  selector:
+    app: satellite
+  ports:
+    - name: tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: satellite
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: satellite
+  template:
+    metadata:
+      labels:
+        app: satellite
+        version: v1
+    spec:
+      containers:
+      - name: satellite
+        image: satellite
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
