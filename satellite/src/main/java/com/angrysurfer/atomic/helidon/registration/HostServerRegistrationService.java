@@ -73,7 +73,7 @@ public class HostServerRegistrationService {
         // Create registration payload
         Map<String, Object> registration = new HashMap<>();
         registration.put("serviceName", serviceName);
-        registration.put("operations", List.of("simple-greet", "greet", "health"));
+        registration.put("operations", List.of("health"));
         registration.put("endpoint", String.format("http://%s:%d", serviceHost, port));
         registration.put("healthCheck", String.format("http://%s:%d/health", serviceHost, port));
         registration.put("framework", "Helidon MP");

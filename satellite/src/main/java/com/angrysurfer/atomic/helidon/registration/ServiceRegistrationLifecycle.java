@@ -1,4 +1,4 @@
-package com.angrysurfer.atomic.helidon.registration;
+2package com.angrysurfer.atomic.helidon.registration;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
