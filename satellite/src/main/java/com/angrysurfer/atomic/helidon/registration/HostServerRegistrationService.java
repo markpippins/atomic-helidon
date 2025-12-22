@@ -1,10 +1,5 @@
 package com.angrysurfer.atomic.helidon.registration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -19,13 +14,20 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 @ApplicationScoped
 public class HostServerRegistrationService {
 
     private static final Logger logger = Logger.getLogger(HostServerRegistrationService.class.getName());
 
     @Inject
-    @ConfigProperty(name = "host.server.url", defaultValue = "http://localhost:8085")
+    @ConfigProperty(name = "host.server.url", defaultValue = "http://172.16.30.15:8085")
     String hostServerUrl;
 
     @Inject
@@ -33,7 +35,7 @@ public class HostServerRegistrationService {
     int port;
 
     @Inject
-    @ConfigProperty(name = "service.name", defaultValue = "satellite")
+    @ConfigProperty(name = "service.name", defaultValue = "helidon-satellite")
     String serviceName;
 
     @Inject
@@ -69,6 +71,7 @@ public class HostServerRegistrationService {
         }
 
         logger.info("Starting registration with host server: " + hostServerUrl);
+        logger.info("Service details - Name: " + serviceName + ", Host: " + serviceHost + ", Port: " + port);
 
         // Create registration payload
         Map<String, Object> registration = new HashMap<>();
@@ -90,7 +93,8 @@ public class HostServerRegistrationService {
         // Send registration request
         try {
             String jsonPayload = objectMapper.writeValueAsString(registration);
-            
+            logger.fine("Registration payload: " + jsonPayload);
+
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(hostServerUrl + "/api/registry/register"))
                     .header("Content-Type", "application/json")
@@ -103,11 +107,11 @@ public class HostServerRegistrationService {
             if (response.statusCode() == 200) {
                 logger.info("Successfully registered with host server: " + serviceName);
                 logger.info("Service endpoint: " + String.format("http://%s:%d", serviceHost, port));
-                
+
                 // Start heartbeat scheduler
                 startHeartbeat();
             } else {
-                logger.warning("Failed to register with host server. Status: " + response.statusCode() + 
+                logger.warning("Failed to register with host server. Status: " + response.statusCode() +
                               ", Response: " + response.body());
             }
         } catch (IOException | InterruptedException e) {
@@ -134,14 +138,17 @@ public class HostServerRegistrationService {
 
             if (response.statusCode() == 200) {
                 logger.info("Heartbeat sent successfully for: " + serviceName);
+            } else if (response.statusCode() == 404) {
+                logger.warning("Service " + serviceName + " not found in registry. May need to re-register.");
             } else {
-                logger.warning("Failed to send heartbeat. Status: " + response.statusCode());
+                logger.warning("Failed to send heartbeat for " + serviceName + ". Status: " + response.statusCode() +
+                              ", Response: " + response.body());
             }
         } catch (IOException | InterruptedException e) {
-            logger.warning("Error sending heartbeat: " + e.getMessage());
+            logger.warning("Error sending heartbeat for " + serviceName + ": " + e.getMessage());
             Thread.currentThread().interrupt();
         } catch (Exception e) {
-            logger.warning("Error sending heartbeat: " + e.getMessage());
+            logger.warning("Error sending heartbeat for " + serviceName + ": " + e.getMessage());
         }
     }
 
@@ -156,23 +163,28 @@ public class HostServerRegistrationService {
             heartbeatInterval,
             TimeUnit.SECONDS
         );
-        logger.info("Heartbeat scheduler started with interval: " + heartbeatInterval + " seconds");
+        logger.info("Heartbeat scheduler started for service: " + serviceName + " with interval: " + heartbeatInterval + " seconds");
     }
 
     /**
      * Cleanup resources on shutdown
      */
     public void cleanup() {
+        logger.info("Cleaning up registration service for: " + serviceName);
         if (scheduler != null && !scheduler.isShutdown()) {
+            logger.info("Shutting down heartbeat scheduler for: " + serviceName);
             scheduler.shutdown();
             try {
                 if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                    logger.info("Forcefully shutting down heartbeat scheduler for: " + serviceName);
                     scheduler.shutdownNow();
                 }
             } catch (InterruptedException e) {
+                logger.warning("Interrupted while waiting for heartbeat scheduler termination for: " + serviceName);
                 scheduler.shutdownNow();
                 Thread.currentThread().interrupt();
             }
         }
+        logger.info("Registration service cleanup completed for: " + serviceName);
     }
 }
