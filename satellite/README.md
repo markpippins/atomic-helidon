@@ -68,7 +68,7 @@ docker build -t satellite .
 ## Running the Docker Image
 
 ```
-docker run --rm -p 8080:8080 satellite:latest
+docker run --rm -p 9093:9093 satellite:latest
 ```
 
 Exercise the application as described above.
@@ -91,7 +91,7 @@ kubectl get pods                            # Verify connectivity to cluster
 kubectl create -f app.yaml                              # Deploy application
 kubectl get pods                                        # Wait for quickstart pod to be RUNNING
 kubectl get service  satellite                     # Get service info
-kubectl port-forward service/satellite 8081:8080   # Forward service port to 8081
+kubectl port-forward service/satellite 8081:9093   # Forward service port to 8081
 ```
 
 You can now exercise the application as you did before but use the port number 8081.

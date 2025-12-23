@@ -27,7 +27,7 @@ public class HostServerRegistrationService {
     private static final Logger logger = Logger.getLogger(HostServerRegistrationService.class.getName());
 
     @Inject
-    @ConfigProperty(name = "host.server.url", defaultValue = "http://172.16.30.15:8085")
+    @ConfigProperty(name = "host.server.url", defaultValue = "http://localhost:8085")
     String hostServerUrl;
 
     @Inject
