@@ -26,3 +26,4 @@ satellite/.idea/runConfigurations/configuration.xml
 .gitignore
 satellite/.dockerignore
 satellite/.helidon
+user-access-service/.idea/runConfigurations/configuration.xml
