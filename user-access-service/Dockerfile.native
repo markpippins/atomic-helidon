@@ -32,8 +32,8 @@ FROM scratch
 WORKDIR /helidon
 
 # Copy the binary built in the 1st stage
-COPY --from=build /helidon/target/satellite .
+COPY --from=build /helidon/target/user-access-service .
 
-ENTRYPOINT ["./satellite"]
+ENTRYPOINT ["./user-access-service"]
 
 EXPOSE 8080

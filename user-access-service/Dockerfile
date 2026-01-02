@@ -31,9 +31,9 @@ FROM container-registry.oracle.com/java/jdk-no-fee-term:21
 WORKDIR /helidon
 
 # Copy the binary built in the 1st stage
-COPY --from=build /helidon/target/satellite.jar ./
+COPY --from=build /helidon/target/user-access-service.jar ./
 COPY --from=build /helidon/target/libs ./libs
 
-CMD ["java", "-jar", "satellite.jar"]
+CMD ["java", "-jar", "user-access-service.jar"]
 
 EXPOSE 8080

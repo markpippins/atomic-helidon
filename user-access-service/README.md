@@ -1,4 +1,4 @@
-# satellite
+# user-access-service
 
 Sample Helidon MP project that includes multiple REST operations.
 
@@ -8,7 +8,7 @@ Sample Helidon MP project that includes multiple REST operations.
 With JDK21
 ```bash
 mvn package
-java -jar target/satellite.jar
+java -jar target/user-access-service.jar
 ```
 
 ## Exercise the application
@@ -62,13 +62,13 @@ curl -H 'Accept: application/json' -X GET http://localhost:8080/metrics
 ## Building the Docker Image
 
 ```
-docker build -t satellite .
+docker build -t user-access-service .
 ```
 
 ## Running the Docker Image
 
 ```
-docker run --rm -p 9093:9093 satellite:latest
+docker run --rm -p 9093:9093 user-access-service:latest
 ```
 
 Exercise the application as described above.
@@ -90,8 +90,8 @@ kubectl get pods                            # Verify connectivity to cluster
 ```
 kubectl create -f app.yaml                              # Deploy application
 kubectl get pods                                        # Wait for quickstart pod to be RUNNING
-kubectl get service  satellite                     # Get service info
-kubectl port-forward service/satellite 8081:9093   # Forward service port to 8081
+kubectl get service  user-access-service                     # Get service info
+kubectl port-forward service/user-access-service 8081:9093   # Forward service port to 8081
 ```
 
 You can now exercise the application as you did before but use the port number 8081.
@@ -114,11 +114,11 @@ mvn package -Pjlink-image
 This uses the helidon-maven-plugin to perform the custom image generation.
 After the build completes it will report some statistics about the build including the reduction in image size.
 
-The target/satellite-jri directory is a self contained custom image of your application. It contains your application,
+The target/user-access-service-jri directory is a self contained custom image of your application. It contains your application,
 its runtime dependencies and the JDK modules it depends on. You can start your application using the provide start script:
 
 ```
-./target/satellite-jri/bin/start
+./target/user-access-service-jri/bin/start
 ```
 
 Class Data Sharing (CDS) Archive

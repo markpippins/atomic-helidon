@@ -35,7 +35,7 @@ public class HostServerRegistrationService {
     int port;
 
     @Inject
-    @ConfigProperty(name = "service.name", defaultValue = "helidon-satellite")
+    @ConfigProperty(name = "service.name", defaultValue = "helidon-user-access-service")
     String serviceName;
 
     @Inject
@@ -112,7 +112,7 @@ public class HostServerRegistrationService {
                 startHeartbeat();
             } else {
                 logger.warning("Failed to register with host server. Status: " + response.statusCode() +
-                              ", Response: " + response.body());
+                        ", Response: " + response.body());
             }
         } catch (IOException | InterruptedException e) {
             logger.severe("Error registering with host server: " + e.getMessage());
@@ -142,7 +142,7 @@ public class HostServerRegistrationService {
                 logger.warning("Service " + serviceName + " not found in registry. May need to re-register.");
             } else {
                 logger.warning("Failed to send heartbeat for " + serviceName + ". Status: " + response.statusCode() +
-                              ", Response: " + response.body());
+                        ", Response: " + response.body());
             }
         } catch (IOException | InterruptedException e) {
             logger.warning("Error sending heartbeat for " + serviceName + ": " + e.getMessage());
@@ -158,12 +158,12 @@ public class HostServerRegistrationService {
     private void startHeartbeat() {
         scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(
-            this::sendHeartbeat,
-            heartbeatInterval,
-            heartbeatInterval,
-            TimeUnit.SECONDS
-        );
-        logger.info("Heartbeat scheduler started for service: " + serviceName + " with interval: " + heartbeatInterval + " seconds");
+                this::sendHeartbeat,
+                heartbeatInterval,
+                heartbeatInterval,
+                TimeUnit.SECONDS);
+        logger.info("Heartbeat scheduler started for service: " + serviceName + " with interval: " + heartbeatInterval
+                + " seconds");
     }
 
     /**
