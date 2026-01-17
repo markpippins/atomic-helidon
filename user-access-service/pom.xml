@@ -9,9 +9,14 @@
         <version>4.3.2</version>
         <relativePath/>
     </parent>
+
     <groupId>com.angrysurfer.atomic</groupId>
     <artifactId>user-access-service</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+
+
+    <name>Helidon UAC</name>
+    <description>Helidon User Access Control Service</description>
 
     <dependencies>
         <dependency>
@@ -116,7 +121,7 @@
                 <executions>
                     <execution>
                         <id>copy-libs</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
@@ -131,6 +136,19 @@
                         <id>make-index</id>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.angrysurfer.atomic.user.Main</mainClass>
+                    <arguments>
+                        <argument>-noverify</argument>
+                        <argument>-XX:TieredStopAtLevel=1</argument>
+                        <argument>-Dcom.sun.management.jmxremote</argument>
+                    </arguments>
+                </configuration>
             </plugin>
         </plugins>
     </build>
