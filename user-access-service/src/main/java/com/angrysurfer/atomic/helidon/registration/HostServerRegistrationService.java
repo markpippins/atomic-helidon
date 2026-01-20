@@ -31,7 +31,7 @@ public class HostServerRegistrationService {
     String hostServerUrl;
 
     @Inject
-    @ConfigProperty(name = "server.port", defaultValue = "8080")
+    @ConfigProperty(name = "server.port", defaultValue = "9093")
     int port;
 
     @Inject
@@ -76,7 +76,12 @@ public class HostServerRegistrationService {
         // Create registration payload
         Map<String, Object> registration = new HashMap<>();
         registration.put("serviceName", serviceName);
-        registration.put("operations", List.of("health"));
+        registration.put("operations", List.of(
+            "validateUser",
+            "getUserProfile",
+            "authenticate",
+            "authorize"
+        ));
         registration.put("endpoint", String.format("http://%s:%d", serviceHost, port));
         registration.put("healthCheck", String.format("http://%s:%d/health", serviceHost, port));
         registration.put("framework", "Helidon MP");
@@ -84,11 +89,17 @@ public class HostServerRegistrationService {
         registration.put("port", port);
 
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put("type", "helidon-service");
+        metadata.put("type", "user-access-service");
         metadata.put("language", "Java");
         metadata.put("runtime", "Helidon");
         metadata.put("native-capable", true);
+        metadata.put("category", "authentication");
+        metadata.put("capabilities", List.of("user-validation", "authentication", "authorization"));
         registration.put("metadata", metadata);
+
+        // Start heartbeat scheduler regardless of initial registration success
+        // This ensures the service keeps trying to register and stays visible to the host-server
+        startHeartbeat();
 
         // Send registration request
         try {
@@ -107,9 +118,6 @@ public class HostServerRegistrationService {
             if (response.statusCode() == 200) {
                 logger.info("Successfully registered with host server: " + serviceName);
                 logger.info("Service endpoint: " + String.format("http://%s:%d", serviceHost, port));
-
-                // Start heartbeat scheduler
-                startHeartbeat();
             } else {
                 logger.warning("Failed to register with host server. Status: " + response.statusCode() +
                         ", Response: " + response.body());
@@ -137,9 +145,9 @@ public class HostServerRegistrationService {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                logger.info("Heartbeat sent successfully for: " + serviceName);
+                logger.fine("Heartbeat sent successfully for: " + serviceName);
             } else if (response.statusCode() == 404) {
-                logger.warning("Service " + serviceName + " not found in registry. May need to re-register.");
+                logger.warning("Service " + serviceName + " not found in registry. Will attempt re-registration on next heartbeat cycle.");
             } else {
                 logger.warning("Failed to send heartbeat for " + serviceName + ". Status: " + response.statusCode() +
                         ", Response: " + response.body());
