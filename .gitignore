@@ -27,3 +27,5 @@ satellite/.idea/runConfigurations/configuration.xml
 satellite/.dockerignore
 satellite/.helidon
 user-access-service/.idea/runConfigurations/configuration.xml
+user-access-service/.helidon
+user-access-service/classpath.txt
