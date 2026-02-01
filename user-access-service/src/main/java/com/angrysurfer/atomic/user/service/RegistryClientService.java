@@ -31,7 +31,7 @@ public class RegistryClientService {
     private static final Logger LOGGER = Logger.getLogger(RegistryClientService.class.getName());
 
     @Inject
-    @ConfigProperty(name = "host.server.url", defaultValue = "http://localhost:8085")
+    @ConfigProperty(name = "service.registry.url", defaultValue = "http://localhost:8085")
     String hostServerUrl;
 
     @Inject
@@ -64,7 +64,7 @@ public class RegistryClientService {
      */
     void onStart(@Observes @RuntimeStart Object event) {
         if (!registrationEnabled) {
-            LOGGER.info("Host-server registration is disabled");
+            LOGGER.info("Service-Registry registration is disabled");
             return;
         }
 

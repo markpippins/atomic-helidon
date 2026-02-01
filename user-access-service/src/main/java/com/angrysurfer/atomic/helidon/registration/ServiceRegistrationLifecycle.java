@@ -9,7 +9,7 @@ import jakarta.inject.Inject;
 public class ServiceRegistrationLifecycle {
 
     @Inject
-    private HostServerRegistrationService registrationService;
+    private ServiceRegistryRegistrationService registrationService;
 
     @PostConstruct
     public void initialize() {
